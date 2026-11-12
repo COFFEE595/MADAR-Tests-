@@ -1,5 +1,5 @@
 /* عامل الخدمة: يخزن الواجهة والكتب للعمل دون اتصال */
-const VER = 'lr-v3',
+const VER = 'lr-v7',
       SHELL = ['./', 'index.html', 'generators.js', 'manifest.webmanifest', 'favicon.svg', 'books/index.json'];
 
 self.addEventListener('install', e => {
