@@ -1,0 +1,2 @@
+{ "name": "مراجعة قانونية", "short_name": "مراجعة", "lang": "ar", "dir": "rtl", "start_url": "./", "scope": "./", "display": "standalone", "background_color": "#EDEFF2", "theme_color": "#3E75AC",
+  "icons": [ { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }, { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }, { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" } ] }

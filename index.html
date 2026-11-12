@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>مراجعة قانونية</title>
+<meta name="theme-color" content="#3E75AC">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--accent:#3E75AC;--accent-ink:#2C567F;--accent-soft:#EAF1F8;--on-accent:#fff;--bg:#EDEFF2;--paper:#FAFAFA;--text:#2A2A2A;--text2:#5A5F68;--faint:#666B73;--border:#E3E6EB;--ok:#1E7B4A;--bad:#B3261E;--hl:#FFE9A6;--ui:"Cairo","IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;--fs:1.05rem;--r:12px;--shadow:0 2px 5px rgba(20,20,25,.06),0 14px 34px -14px rgba(20,20,25,.22)}
+:root[data-theme=dark]{--bg:#0F1012;--paper:#1B1C1F;--text:#EDEEF0;--text2:#A9AEB6;--faint:#8C9098;--border:#2B2C30;--accent:#6FA0D4;--accent-ink:#8FB8E0;--accent-soft:#1E2A38;--on-accent:#0F1012;--ok:#5CC389;--bad:#FF8A80;--hl:#4A3F12}
+:root[data-theme=sepia]{--bg:#E5D9BE;--paper:#F7F0DD;--text:#2E2416;--text2:#4E3D28;--faint:#6E5A3C;--border:#DDCFB0;--accent:#785418;--accent-ink:#7A5620;--accent-soft:#EFE3C4;--hl:#F3D98A}
+@media(prefers-color-scheme:dark){:root[data-theme=auto]{--bg:#0F1012;--paper:#1B1C1F;--text:#EDEEF0;--text2:#A9AEB6;--faint:#8C9098;--border:#2B2C30;--accent:#6FA0D4;--accent-ink:#8FB8E0;--accent-soft:#1E2A38;--on-accent:#0F1012;--ok:#5CC389;--bad:#FF8A80;--hl:#4A3F12}}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--ui)}
+body{overflow:hidden;padding-top:env(safe-area-inset-top,0)}
+button{font:inherit;color:inherit;cursor:pointer}
+.view{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);padding-top:env(safe-area-inset-top,0)}
+.view.hidden{display:none}
+.topbar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--paper);border-bottom:1px solid var(--border);min-height:52px}
+.topbar .title{flex:1;font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.ib{width:40px;height:40px;border:0;border-radius:10px;background:transparent;display:grid;place-items:center;font-size:1.15rem;color:var(--text)}
+.ib:hover,.ib:focus-visible{background:var(--accent-soft)}
+.ib[disabled]{opacity:.35}
+.btn{border:0;border-radius:var(--r);padding:11px 16px;background:var(--accent);color:var(--on-accent);font-weight:700}
+.btn.sec{background:var(--accent-soft);color:var(--accent-ink)}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn[disabled]{opacity:.5}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px calc(24px + env(safe-area-inset-bottom,0))}
+.wrap{max-width:760px;margin:0 auto}
+/* المكتبة */
+.hero{display:flex;gap:14px;align-items:center;padding:6px 2px 18px}
+.mark{width:56px;height:56px;border-radius:14px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:1.6rem;font-weight:800;flex:none}
+.hero h1{margin:0;font-size:1.2rem}.hero p{margin:2px 0 0;color:var(--text2);font-size:.82rem}
+.card{background:var(--paper);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 4px;font-size:1rem}.card .meta{color:var(--text2);font-size:.8rem}
+.card .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.bar{height:6px;background:var(--border);border-radius:9px;overflow:hidden;margin-top:10px}.bar>i{display:block;height:100%;background:var(--accent);width:0}
+.sect{font-size:.85rem;color:var(--text2);margin:18px 2px 8px;font-weight:700}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+/* القراءة */
+.progress{height:3px;background:var(--border)}.progress>i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.reader{font-size:var(--fs);line-height:2;background:var(--paper)}
+.reader .crumb{font-size:.78rem;color:var(--faint);margin-bottom:6px}
+.reader h2{font-size:1.35em;margin:.2em 0 .8em;color:var(--accent-ink);line-height:1.5}
+.reader h3{font-size:1.1em;margin:1.4em 0 .4em;line-height:1.6}
+.reader p{margin:0 0 .9em;padding:2px 6px;border-radius:8px;text-align:justify}
+.reader p.hl{background:var(--hl)}
+.reader p.speaking{background:var(--accent-soft);box-shadow:inset -3px 0 0 var(--accent)}
+.reader p.has-bm::before{content:"🔖 ";font-size:.8em}
+.reader p.has-note{border-inline-start:3px solid var(--accent)}
+.reader mark{background:var(--hl);color:inherit;border-radius:3px}
+.chnav{display:flex;gap:8px;justify-content:space-between;margin:22px 0 6px}
+.chnav .btn{flex:1}
+/* طبقات */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:50;display:none}
+.ov.on{display:block}
+.drawer{position:absolute;top:0;bottom:0;inset-inline-start:0;width:min(88vw,380px);background:var(--paper);display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.drawer .scroll{padding:8px 8px 20px}
+.toc-part{font-weight:800;font-size:.82rem;color:var(--accent-ink);margin:14px 8px 4px}
+.toc-sec{font-weight:700;font-size:.8rem;color:var(--text2);margin:8px 8px 2px}
+.toc-ch{display:block;width:100%;text-align:start;border:0;background:transparent;padding:9px 12px;border-radius:9px;font-size:.9rem;line-height:1.5}
+.toc-ch.cur{background:var(--accent-soft);color:var(--accent-ink);font-weight:700}
+.sheet{position:absolute;bottom:0;left:0;right:0;max-height:86vh;overflow:auto;background:var(--paper);border-radius:18px 18px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0));box-shadow:var(--shadow);max-width:640px;margin:0 auto}
+.sheet h4{margin:16px 0 8px;font-size:.88rem;color:var(--text2)}.sheet h4:first-child{margin-top:0}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg button{flex:1;min-width:64px;border:1px solid var(--border);background:transparent;border-radius:10px;padding:9px 6px}
+.seg button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.stepper{display:flex;align-items:center;gap:12px}.stepper span{min-width:56px;text-align:center;font-weight:700}
+.sheet select,.sheet input[type=text],.sheet textarea,.modal input[type=text],.modal textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
+.sheet textarea{min-height:110px}
+.modal{position:absolute;inset:0;margin:auto;height:fit-content;max-height:88vh;overflow:auto;width:min(94vw,560px);background:var(--paper);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.sinput{display:flex;gap:6px;align-items:center;padding:10px;background:var(--paper);border-bottom:1px solid var(--border)}
+.sinput input{flex:1;font:inherit;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
+.res{display:block;width:100%;text-align:start;background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;line-height:1.8}
+.res small{display:block;color:var(--faint);font-size:.74rem}
+.empty{text-align:center;color:var(--text2);padding:40px 10px;line-height:2}
+/* التدريب */
+.q{font-size:1.05rem;line-height:1.9;white-space:pre-wrap;margin:6px 0 14px}
+.opt{display:block;width:100%;text-align:start;border:1px solid var(--border);background:var(--paper);border-radius:12px;padding:12px 14px;margin-bottom:9px;line-height:1.7}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--paper))}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--paper))}
+.expl{background:var(--accent-soft);border-radius:12px;padding:10px 12px;margin:10px 0;line-height:1.8;font-size:.93rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center}
+.stat b{display:block;font-size:1.25rem;color:var(--accent-ink)}.stat span{font-size:.72rem;color:var(--text2)}
+.qhead{display:flex;justify-content:space-between;color:var(--text2);font-size:.8rem}
+.stopfab{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0));inset-inline-start:16px;z-index:60;display:none;border:0;border-radius:99px;padding:11px 18px;background:var(--accent);color:var(--on-accent);font-weight:700;box-shadow:var(--shadow)}
+.stopfab.on{display:block}
+#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:90;background:#222;color:#fff;border-radius:12px;padding:10px 16px;font-size:.88rem;max-width:90vw;display:none}
+#toast.on{display:block}
+.banner{background:#FFF3CD;color:#5c4400;padding:8px 12px;font-size:.82rem;display:none}
+.banner.on{display:block}
+.pv-tree{max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:10px;padding:8px;font-size:.84rem;line-height:1.8;margin:8px 0}
+.pv-tree div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(min-width:900px){.scroll{padding:24px}}
+/* كتل المحتوى الغنية (تنسيق مستوحى من ملف مدار) */
+:root{--gold:#B8901F;--gold-ink:#7A5A0A;--gold-bg:#FBF6E6;--gold-bd:#E7D8A4;--def-bg:#F4F7FC;--def-bd:#D5DDEE;--rfont:var(--ui)}
+:root[data-theme=dark]{--gold:#D9B84A;--gold-ink:#E6CD7C;--gold-bg:#2A2414;--gold-bd:#4A3F1E;--def-bg:#1B2433;--def-bd:#2C3A52}
+:root[data-theme=sepia]{--gold:#A87914;--gold-ink:#6B4A06;--gold-bg:#F3E6BC;--gold-bd:#DCC888;--def-bg:#F0E6CC;--def-bd:#DDCFB0}
+@media(prefers-color-scheme:dark){:root[data-theme=auto]{--gold:#D9B84A;--gold-ink:#E6CD7C;--gold-bg:#2A2414;--gold-bd:#4A3F1E;--def-bg:#1B2433;--def-bd:#2C3A52}}
+.reader{font-family:var(--rfont)}
+.reader b,.reader strong{font-weight:700;color:var(--accent-ink)}
+.reader .b{margin:0 0 .9em;padding:2px 6px;border-radius:8px}
+.reader p.b,.reader .b-ul li,.reader .b-ol li{text-align:justify}
+.reader [data-k].hl{background:var(--hl)}
+.reader [data-k].speaking{background:var(--accent-soft);box-shadow:inset -3px 0 0 var(--accent)}
+.reader [data-k].has-bm::before{content:"🔖 ";font-size:.8em}
+.reader [data-k].has-note{border-inline-start:3px solid var(--accent)}
+.reader [data-k].edited::after{content:" ✎";font-size:.75em;color:var(--gold-ink)}
+.reader .sub-h{position:relative;font-size:1.18em;color:var(--accent-ink);margin:1.9em 0 .9em;padding-bottom:.4em;border-bottom:1px solid var(--border);line-height:1.6}
+.reader .sub-h::after{content:"";position:absolute;inset-inline-start:0;bottom:-1px;width:56px;height:3px;background:var(--gold)}
+.reader .b-h2{font-weight:700;font-size:1.08em;margin:1.5em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--border);line-height:1.7}
+.reader .b-h3{font-weight:700;color:var(--accent-ink);margin:1.2em 0 .4em;line-height:1.7}
+.reader .b-h4{font-weight:600;color:var(--text2);font-size:.98em;margin:1em 0 .3em;line-height:1.7}
+.reader .b-ul{list-style:none;margin:0 0 .9em}
+.reader .b-ul li{position:relative;padding-inline-start:1.3em;margin:.35em 0}
+.reader .b-ul li::before{content:"";position:absolute;inset-inline-start:.2em;top:.85em;width:.4em;height:.4em;border-radius:50%;background:var(--gold)}
+.reader .b-ol{padding-inline-start:2em;margin:0 0 .9em}
+.reader .b-ol li{margin:.35em 0}.reader .b-ol li::marker{color:var(--gold-ink);font-weight:700}
+.reader .co{--co-ac:var(--accent);--co-bg:var(--def-bg);--co-bd:var(--def-bd);--co-fg:var(--accent-ink);padding:0;margin:1em 0;border:1px solid var(--co-bd);border-inline-start:4px solid var(--co-ac);border-radius:10px;background:var(--co-bg);text-align:start}
+.reader .co-ruling,.reader .co-ex{--co-ac:#64748B;--co-bg:var(--paper);--co-bd:var(--border);--co-fg:var(--text2)}
+.reader .co-why,.reader .co-idea,.reader .co-note{--co-ac:var(--gold);--co-bg:var(--gold-bg);--co-bd:var(--gold-bd);--co-fg:var(--gold-ink)}
+.reader .co-h{padding:.55em .9em 0;font-weight:700;font-size:.84em;color:var(--co-fg)}
+.reader .co-b{padding:.15em .9em .7em;line-height:1.95}
+.reader .co.quote .co-b{font-family:"Noto Naskh Arabic","Amiri","Traditional Arabic",serif;font-size:1.04em;line-height:2.1}
+.reader .b-table{overflow-x:auto;padding:0}
+.reader .b-table table{width:100%;border-collapse:collapse;font-size:.92em;line-height:1.7}
+.reader .b-table th{background:var(--accent-soft);color:var(--accent-ink);text-align:start}
+.reader .b-table th,.reader .b-table td{border:1px solid var(--border);padding:.45em .6em;vertical-align:top}
+.reader .b-table td:first-child{text-align:center;font-weight:700;color:var(--text2)}
+.edbar{display:none;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:var(--gold-bg);border-bottom:1px solid var(--gold-bd);font-size:.8rem;color:var(--gold-ink);line-height:1.7}
+.edbar.on{display:flex}.edbar span{flex:1 1 100%}.edbar .btn{flex:1;padding:7px 12px}
+.editing .reader [data-k]{outline:1px dashed var(--border);cursor:text}
+.editing .reader [data-k]:focus{outline:2px solid var(--accent);background:var(--paper)}
+.opts-tf{display:grid;grid-template-columns:1fr 1fr;gap:9px}.opts-tf .opt{margin:0;text-align:center;font-weight:700}
+.olt{display:inline-grid;place-items:center;width:1.7em;height:1.7em;margin-inline-end:.6em;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font-size:.8em;font-weight:700}
+</style>
+</head>
+<body>
+<div class="banner" id="storeBanner"></div>
+
+<!-- المكتبة -->
+<section class="view" id="vLib">
+  <div class="topbar"><span class="title" id="libTitle"></span>
+    <button class="ib" id="libSettings" aria-label="الإعدادات">⚙</button></div>
+  <div class="scroll"><div class="wrap">
+    <div class="hero"><div class="mark" id="appMark"></div><div><h1 id="appName"></h1><p id="appSub"></p></div></div>
+    <div id="resumeBox"></div>
+    <div class="tools">
+      <button class="btn sec" id="btnImport">＋ استيراد كتاب (txt)</button>
+      <button class="btn sec" id="btnNotes">🔖 علاماتي وملاحظاتي</button>
+    </div>
+    <div class="sect">المكتبة</div>
+    <div id="libList"></div>
+  </div></div>
+</section>
+
+<!-- القراءة -->
+<section class="view hidden" id="vRead">
+  <div class="topbar">
+    <button class="ib" id="rdBack" aria-label="المكتبة">⟶</button>
+    <button class="ib" id="rdToc" aria-label="الفهرس">☰</button>
+    <span class="title" id="rdTitle"></span>
+    <button class="ib" id="rdSearch" aria-label="بحث">🔍</button>
+    <button class="ib" id="rdListen" aria-label="استماع">🔊</button>
+    <button class="ib" id="rdPrac" aria-label="تدريب">🎯</button>
+    <button class="ib" id="rdSet" aria-label="الإعدادات">⚙</button>
+  </div>
+  <div class="progress"><i id="rdProg"></i></div>
+  <div class="edbar" id="edBar"><span>وضع التعديل: انقر أي نص وعدّله. يُحفظ على جهازك فقط ولا يغيّر الأصل.</span><button class="btn sec" id="edReset">استعادة أصل الفصل</button><button class="btn" id="edDone">تم</button></div>
+  <div class="scroll reader" id="scroller"><div class="wrap" id="chapter"></div></div>
+</section>
+
+<!-- التدريب -->
+<section class="view hidden" id="vPrac">
+  <div class="topbar"><button class="ib" id="prBack" aria-label="رجوع">⟶</button><span class="title">تدريب ومراجعة</span><span style="width:40px"></span></div>
+  <div class="scroll"><div class="wrap" id="prBody"></div></div>
+</section>
+
+<!-- العلامات والملاحظات -->
+<section class="view hidden" id="vNotes">
+  <div class="topbar"><button class="ib" id="ntBack" aria-label="رجوع">⟶</button><span class="title">علاماتي وملاحظاتي</span><span style="width:40px"></span></div>
+  <div class="scroll"><div class="wrap" id="ntBody"></div></div>
+</section>
+
+<!-- الفهرس -->
+<div class="ov" id="ovToc"><div class="drawer"><div class="topbar"><span class="title">الفهرس</span><button class="ib" data-close aria-label="إغلاق">✕</button></div><div class="scroll" id="tocList"></div></div></div>
+
+<!-- البحث -->
+<div class="ov" id="ovSearch" style="background:var(--bg)">
+  <div style="display:flex;flex-direction:column;height:100%">
+    <div class="sinput"><input id="sInput" type="text" placeholder="ابحث في الكتاب (حرفان على الأقل)" aria-label="بحث" autocomplete="off"><button class="ib" data-close aria-label="إغلاق">✕</button></div>
+    <div class="seg" style="padding:8px 10px" id="sScope"><button data-s="book" class="on">الكتاب</button><button data-s="notes">ملاحظاتي</button></div>
+    <div class="scroll" id="sRes"></div>
+  </div>
+</div>
+
+<!-- الإعدادات -->
+<div class="ov" id="ovSet"><div class="sheet">
+  <h4>حجم الخط</h4>
+  <div class="stepper"><button class="btn sec" id="fMinus">−</button><span id="fLabel">100%</span><button class="btn sec" id="fPlus">+</button></div>
+  <h4>المظهر</h4>
+  <div class="seg" id="themeSeg"><button data-t="auto">تلقائي</button><button data-t="light">فاتح</button><button data-t="dark">داكن</button><button data-t="sepia">ورقي</button></div>
+  <h4>خط القراءة</h4>
+  <div class="seg" id="fontSeg"><button data-f="sans">عادي</button><button data-f="naskh">نسخ</button></div>
+  <h4>تعديل نص الكتاب</h4>
+  <div class="seg"><button id="edToggle">وضع التعديل</button></div>
+  <p style="font-size:.78rem;color:var(--text2);margin:6px 0 0">يعدّل النص المعروض على جهازك فقط؛ الأصل لا يتغير ويمكن استعادته.</p>
+  <h4>الصوت (قراءة عربية)</h4>
+  <select id="voiceSel" aria-label="الصوت"></select>
+  <div class="seg" id="rateSeg" style="margin-top:8px"><button data-r="0.8">بطيء</button><button data-r="1">عادي</button><button data-r="1.2">سريع</button></div>
+  <h4>النسخ الاحتياطي</h4>
+  <div class="seg"><button id="bkOut">حفظ نسخة (ملف)</button><button id="bkIn">استعادة من ملف</button></div>
+  <h4>مجلد على جهازك (اختياري)</h4>
+  <div class="seg"><button id="fsLink">ربط مجلد للنسخ الاحتياطي</button></div>
+  <p style="font-size:.78rem;color:var(--text2);margin:6px 0 0" id="fsNote"></p>
+  <div style="margin-top:16px"><button class="btn" data-close style="width:100%">تم</button></div>
+</div></div>
+
+<!-- إجراءات الفقرة -->
+<div class="ov" id="ovPara"><div class="sheet">
+  <p id="paraPrev" style="margin:0 0 12px;font-size:.88rem;color:var(--text2);line-height:1.8"></p>
+  <div class="seg"><button id="pListen">🔊 استمع من هنا</button><button id="pBm">🔖 علامة</button><button id="pNote">📝 ملاحظة</button><button id="pCopy">نسخ</button></div>
+  <div id="noteBox" style="display:none;margin-top:12px"><textarea id="noteTxt" placeholder="اكتب ملاحظتك…" aria-label="الملاحظة"></textarea><div class="seg" style="margin-top:8px"><button class="on" id="noteSave">حفظ</button><button id="noteDel">حذف</button></div></div>
+</div></div>
+
+<!-- معاينة الاستيراد -->
+<div class="ov" id="ovImport"><div class="modal">
+  <h3 style="margin:0 0 8px">استيراد كتاب</h3>
+  <input id="impTitle" type="text" placeholder="عنوان الكتاب" aria-label="عنوان الكتاب">
+  <div id="impStats" style="margin:10px 0 2px;font-size:.86rem;color:var(--text2)"></div>
+  <div class="pv-tree" id="impTree"></div>
+  <p style="font-size:.78rem;color:var(--text2);margin:0 0 10px">تُكتشف العناوين تلقائيًا من الكلمات: باب، قسم، فصل، مبحث/مطلب/فرع. ما عدا ذلك يُعدّ فقرات.</p>
+  <div class="seg"><button class="on" id="impOk">حفظ في مكتبتي</button><button data-close>إلغاء</button></div>
+</div></div>
+
+<button class="stopfab" id="stopFab">⏹ إيقاف الصوت</button>
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="fileTxt" accept=".txt,text/plain" hidden>
+<input type="file" id="fileBk" accept=".json,application/json" hidden>
+
+<script src="generators.js"></script>
+<script>
+'use strict';
+/* ═════ إعدادات المشروع: عدّلها وحدها لتخصيص النسخة (لا تحتاج لمس بقية الكود) ═════ */
+const APP_CONFIG = {
+  name: 'مراجعة قانونية',
+  subtitle: 'كلية الحقوق — قسم القانون',      // الكلية/القسم/السنة
+  logoLetter: 'ق',
+  accent: '#3E75AC',
+  manifestUrl: 'books/index.json',            // قائمة الكتب الجاهزة
+  dbName: 'law-review-db',
+  dailyGoal: 10
+};
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let toastT; function vToast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600); }
+
+/* ═════ طبقة التخزين: IndexedDB مع ذاكرة وسيطة (قراءة متزامنة وكتابة غير متزامنة) ═════ */
+const DB = (function () {
+  const cache = new Map(); let db = null, mode = 'idb';
+  function open() {
+    return new Promise(res => {
+      let req; try { req = indexedDB.open(APP_CONFIG.dbName, 1); } catch (e) { mode = 'mem'; return res(); }
+      req.onupgradeneeded = () => req.result.createObjectStore('kv');
+      req.onerror = () => { mode = 'mem'; res(); };
+      req.onsuccess = () => {
+        db = req.result;
+        try {
+          const st = db.transaction('kv').objectStore('kv'), cur = st.openCursor();
+          cur.onsuccess = () => { const c = cur.result; if (c) { cache.set(c.key, c.value); c.continue(); } else res(); };
+          cur.onerror = () => res();
+        } catch (e) { mode = 'mem'; res(); }
+      };
+    });
+  }
+  function write(fn) { if (!db) return; try { const tx = db.transaction('kv', 'readwrite'); fn(tx.objectStore('kv')); tx.onerror = () => { mode = 'err'; }; } catch (e) { mode = 'err'; } }
+  return {
+    init: open,
+    get: (k, d) => cache.has(k) ? cache.get(k) : d,
+    set(k, v) { cache.set(k, v); write(s => s.put(v, k)); },
+    del(k) { cache.delete(k); write(s => s.delete(k)); },
+    keys(prefix) { return Array.from(cache.keys()).filter(k => !prefix || k.indexOf(prefix) === 0); },
+    all() { const o = {}; cache.forEach((v, k) => { o[k] = v; }); return o; },
+    mode: () => mode
+  };
+})();
+
+/* ═════ الحالة ═════ */
+const S = { lib: [], book: null, bank: [], chs: [], ch: 0, paras: [], settings: null, edit: false };
+function loadSettings() {
+  S.settings = Object.assign({ fs: 100, theme: 'auto', rate: 1, voice: '', font: 'sans' }, DB.get('settings', {}));
+  applySettings();
+}
+function saveSettings() { DB.set('settings', S.settings); }
+function applySettings() {
+  const r = document.documentElement;
+  r.style.setProperty('--fs', (1.05 * S.settings.fs / 100).toFixed(3) + 'rem');
+  r.setAttribute('data-theme', S.settings.theme);
+  r.style.setProperty('--rfont', S.settings.font === 'naskh' ? '"Noto Naskh Arabic","Amiri","Traditional Arabic","Scheherazade New",serif' : 'var(--ui)');
+  document.querySelectorAll('#fontSeg button').forEach(b => b.classList.toggle('on', b.dataset.f === (S.settings.font || 'sans')));
+  $('fLabel').textContent = S.settings.fs + '%';
+  document.querySelectorAll('#themeSeg button').forEach(b => b.classList.toggle('on', b.dataset.t === S.settings.theme));
+  document.querySelectorAll('#rateSeg button').forEach(b => b.classList.toggle('on', +b.dataset.r === +S.settings.rate));
+}
+
+/* ═════ التنقل بين الشاشات والطبقات (زر الرجوع في الهاتف) ═════ */
+const VIEWS = ['vLib', 'vRead', 'vPrac', 'vNotes'];
+let curView = 'vLib';
+function showView(id, push) {
+  VIEWS.forEach(v => $(v).classList.toggle('hidden', v !== id));
+  curView = id;
+  if (push !== false) history.pushState({ v: id }, '');
+}
+const OVS = ['ovToc', 'ovSearch', 'ovSet', 'ovPara', 'ovImport'];
+function openOv(id) { $(id).classList.add('on'); history.pushState({ ov: id }, ''); }
+function closeOv(id, fromPop) {
+  if (!$(id).classList.contains('on')) return;
+  $(id).classList.remove('on');
+  if (!fromPop && history.state && history.state.ov === id) history.back();
+}
+function anyOverlay() { return OVS.find(o => $(o).classList.contains('on')); }
+window.addEventListener('popstate', e => {
+  const o = anyOverlay(); if (o) { $(o).classList.remove('on'); return; }
+  const st = e.state;
+  if (st && st.v) showView(st.v, false);
+  else if (curView !== 'vLib') { if (curView === 'vRead') { stopSpeech(); } showView('vLib', false); }
+});
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-close]'); if (c) { const o = c.closest('.ov'); if (o) closeOv(o.id); }
+  if (e.target.classList && e.target.classList.contains('ov')) closeOv(e.target.id);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { const o = anyOverlay(); if (o) closeOv(o); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k' && curView === 'vRead') { e.preventDefault(); openSearch(); }
+});
+
+/* ═════ الكتب: تحميل وتطبيع ═════ */
+async function fetchJson(url) { const r = await fetch(url); if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); }
+/* يحوّل أي بنية مقبولة إلى قائمة فصول مسطّحة مع سياقها (باب/قسم) */
+/* ═════ كتل المحتوى: فقرة نصية (سلسلة) أو كتلة غنية {t:p|h2|h3|h4|ul|ol|co|table, ...} ═════ */
+const OK_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'MARK', 'BR', 'P', 'UL', 'OL', 'LI', 'TABLE', 'THEAD', 'TBODY', 'TR', 'TH', 'TD', 'DIV', 'SPAN']);
+function sanitize(html) {   /* قائمة بيضاء: وسوم تنسيق فقط، وسمة class وحدها، وتُزال علامات البحث المؤقتة */
+  const d = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html').body;
+  (function walk(n) {
+    Array.from(n.childNodes).forEach(c => {
+      if (c.nodeType === 3) return;
+      if (c.nodeType !== 1 || /^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED)$/.test(c.tagName)) { c.remove(); return; }
+      walk(c);
+      if (!OK_TAGS.has(c.tagName) || (c.tagName === 'MARK' && c.classList.contains('sm'))) { while (c.firstChild) c.parentNode.insertBefore(c.firstChild, c); c.remove(); return; }
+      Array.from(c.attributes).forEach(a => { if (a.name !== 'class' || !/^[\w\- ]*$/.test(a.value)) c.removeAttribute(a.name); });
+    });
+  })(d);
+  return d.innerHTML;
+}
+const htmlText = h => String(h).replace(/<[^>]+>/g, ' ').replace(/&(amp|lt|gt|quot|#39|nbsp);/g, m => ({ '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ' }[m])).replace(/\s+/g, ' ').trim();
+function blockInner(b) {
+  switch (b.t) {
+    case 'ul': case 'ol': return (b.items || []).map(i => '<li>' + i + '</li>').join('');
+    case 'co': return '<div class="co-h">' + esc(b.l || '') + '</div><div class="co-b">' + (b.h || '') + '</div>';
+    case 'table': return '<table><thead><tr>' + (b.head || []).map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>' + (b.rows || []).map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
+    default: return b.h || '';
+  }
+}
+function toBlock(x) {   /* السلسلة = فقرة نصية (تُهرَّب)؛ الكائن = كتلة غنية (يُنقّى HTML فيها) */
+  if (typeof x === 'string') { const b = { t: 'p', h: esc(x) }; b.text = x.replace(/\s+/g, ' ').trim(); return b; }
+  const b = Object.assign({ t: 'p' }, x), sz = sanitize;
+  if (b.h != null) b.h = sz(b.h);
+  if (b.items) b.items = b.items.map(sz);
+  if (b.head) b.head = b.head.map(sz);
+  if (b.rows) b.rows = b.rows.map(r => r.map(sz));
+  b.text = htmlText(blockInner(b)); return b;
+}
+const BTAG = { p: 'p', ul: 'ul', ol: 'ol' };
+const EDITS = () => DB.get('edits', {});
+const ekey = (b, ci, si, pi) => S.book.id + '|' + (b.id ? '#' + b.id : ci + '|' + si + '|' + pi);   // معرّف ثابت إن وُجد
+function flatten(book) {
+  const chs = [], st = book.structure || {};
+  (st.parts || []).forEach((p, pi) => {
+    const secs = p.sections || [{ title: '', chapters: p.chapters || [] }];
+    secs.forEach((s, si) => {
+      (s.chapters || []).forEach((c, ci) => {
+        let subs = c.subsections;
+        if (!subs) subs = [{ title: '', paragraphs: c.paragraphs || [] }];
+        chs.push({ part: p.title || '', sec: s.title || '', title: c.title || '', subs: subs.map(u => ({ title: u.title || '', paragraphs: (u.paragraphs || []).map(toBlock) })), pi: pi, si: si, ci: ci });
+      });
+    });
+  });
+  return chs;
+}
+async function loadLibrary() {
+  let list = [];
+  try { const m = await fetchJson(APP_CONFIG.manifestUrl); list = (m.books || []).map(b => Object.assign({ builtin: true }, b)); } catch (e) { /* لا يوجد manifest: مكتبة المستخدم فقط */ }
+  DB.keys('book:').forEach(k => { const b = DB.get(k); if (b) list.push({ id: b.id, title: b.title, subtitle: b.subtitle || '', imported: true }); });
+  S.lib = list;
+}
+async function getBookData(meta) {
+  if (meta.imported) return DB.get('book:' + meta.id);
+  return fetchJson(meta.file || ('books/' + meta.id + '.json'));
+}
+function bookProgress(id) {
+  const p = DB.get('pos:' + id); if (!p || !p.total) return 0;
+  return Math.min(100, Math.round(100 * (p.gi + 1) / p.total));
+}
+
+/* ═════ شاشة المكتبة ═════ */
+function renderLibrary() {
+  $('appMark').textContent = APP_CONFIG.logoLetter; $('appName').textContent = APP_CONFIG.name;
+  $('appSub').textContent = APP_CONFIG.subtitle; $('libTitle').textContent = APP_CONFIG.name;
+  const lastId = DB.get('lastBook'), last = S.lib.find(b => b.id === lastId);
+  $('resumeBox').innerHTML = last ? '<div class="card"><h3>متابعة القراءة</h3><div class="meta">' + esc(last.title) + ' — ' + bookProgress(last.id) + '٪</div><div class="row"><button class="btn" data-open="' + esc(last.id) + '">تابع من حيث توقفت</button></div></div>' : '';
+  const el = $('libList');
+  if (!S.lib.length) { el.innerHTML = '<div class="empty">المكتبة فارغة.<br>استورد كتابًا بصيغة txt، أو ضع ملفات JSON في مجلد books/.</div>'; return; }
+  el.innerHTML = S.lib.map(b => '<div class="card"><h3>' + esc(b.title) + '</h3><div class="meta">' + esc(b.subtitle || '') + (b.imported ? ' · مستورد' : '') + '</div><div class="bar"><i style="width:' + bookProgress(b.id) + '%"></i></div><div class="row"><button class="btn" data-open="' + esc(b.id) + '">قراءة</button><button class="btn sec" data-prac="' + esc(b.id) + '">تدريب</button>' + (b.imported ? '<button class="btn ghost" data-del="' + esc(b.id) + '">حذف</button>' : '') + '</div></div>').join('');
+}
+$('libList').addEventListener('click', onLibClick); $('resumeBox').addEventListener('click', onLibClick);
+async function onLibClick(e) {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.open) openBook(b.dataset.open);
+  else if (b.dataset.prac) { await ensureBook(b.dataset.prac); openPractice(); }
+  else if (b.dataset.del) {
+    if (!confirm('حذف هذا الكتاب المستورد وكل علاماته وملاحظاته؟')) return;
+    const id = b.dataset.del; DB.del('book:' + id); DB.del('pos:' + id);
+    const n = DB.get('notes', {}); Object.keys(n).forEach(k => { if (k.indexOf(id + '|') === 0) delete n[k]; }); DB.set('notes', n);
+    const ee = DB.get('edits', {}); Object.keys(ee).forEach(k => { if (k.indexOf(id + '|') === 0) delete ee[k]; }); DB.set('edits', ee);
+    if (DB.get('lastBook') === id) DB.del('lastBook');
+    await loadLibrary(); renderLibrary(); vToast('تم الحذف');
+  }
+}
+
+/* ═════ فتح كتاب ═════ */
+async function ensureBook(id) {
+  if (S.book && S.book.id === id) return true;
+  const meta = S.lib.find(b => b.id === id); if (!meta) return false;
+  try {
+    const data = await getBookData(meta);
+    S.book = data; S.chs = flatten(data); S.bank = []; S.paras = null;
+    if (meta.builtin) { try { const q = await fetchJson(meta.questions || ('questions/' + meta.id + '.json')); S.bank = q.questions || []; } catch (e) { S.bank = []; } }
+    else S.bank = DB.get('bank:' + id, []);
+    return true;
+  } catch (e) { vToast('تعذّر تحميل الكتاب'); return false; }
+}
+function allParas() {
+  if (S.paras) return S.paras; const out = [], ed = EDITS();
+  S.chs.forEach((c, ci) => c.subs.forEach((s, si) => s.paragraphs.forEach((b, pi) => { const e = ed[ekey(b, ci, si, pi)]; out.push({ key: pKey(ci, si, pi), text: e != null ? htmlText(e) : b.text, ci: ci, si: si, pi: pi, title: c.title, t: b.t }); })));
+  return (S.paras = out);
+}
+const pKey = (ci, si, pi) => S.book.id + '|' + ci + '|' + si + '|' + pi;
+async function openBook(id) {
+  if (!(await ensureBook(id))) return;
+  DB.set('lastBook', id);
+  const pos = DB.get('pos:' + id) || { ch: 0 };
+  showView('vRead');
+  $('rdTitle').textContent = S.book.title;
+  renderChapter(Math.min(pos.ch || 0, S.chs.length - 1), pos.key || null);
+}
+
+/* ═════ عرض الفصل ═════ */
+function renderChapter(i, anchorKey, hlTerm, flash) {
+  const wasEdit = S.edit; leaveEdit(true);
+  stopSpeech();
+  if (i < 0 || i >= S.chs.length) return;
+  S.ch = i; const c = S.chs[i], notes = DB.get('notes', {}), ed = EDITS();
+  let h = '<div class="crumb">' + esc([c.part, c.sec].filter(Boolean).join(' › ')) + '</div><h2>' + esc(c.title) + '</h2>';
+  c.subs.forEach((s, si) => {
+    if (s.title) h += '<h3 class="sub-h">' + esc(s.title) + '</h3>';
+    s.paragraphs.forEach((b, pi) => {
+      const k = pKey(i, si, pi), n = notes[k], ek = ekey(b, i, si, pi), e = ed[ek], tag = BTAG[b.t] || 'div';
+      const cls = ['b', 'b-' + b.t].concat(b.t === 'co' ? ['co', 'co-' + (b.k || 'note')].concat(b.q ? ['quote'] : []) : [], n && n.bm ? ['has-bm'] : [], n && n.text ? ['has-note'] : [], e != null ? ['edited'] : []);
+      const role = /^h[234]$/.test(b.t) ? ' role="heading" aria-level="' + (+b.t[1] + 1) + '"' : '';
+      h += '<' + tag + ' class="' + cls.join(' ') + '"' + role + ' data-k="' + esc(k) + '" data-e="' + esc(ek) + '" data-ci="' + i + '" data-si="' + si + '" data-pi="' + pi + '">' + (e != null ? e : blockInner(b)) + '</' + tag + '>';
+    });
+  });
+  h += '<div class="chnav"><button class="btn sec" id="prevCh"' + (i === 0 ? ' disabled' : '') + '>→ الفصل السابق</button><button class="btn" id="nextCh"' + (i === S.chs.length - 1 ? ' disabled' : '') + '>الفصل التالي ←</button></div>';
+  $('chapter').innerHTML = h;
+  const sc = $('scroller'); sc.scrollTop = 0;
+  if (anchorKey) { const p = $('chapter').querySelector('[data-k="' + CSS.escape(anchorKey) + '"]'); if (p) { if (hlTerm) markIn(p, hlTerm); p.scrollIntoView({ block: 'center' }); if (hlTerm || flash) { p.classList.add('hl'); setTimeout(() => p.classList.remove('hl'), 3500); } } }
+  if (wasEdit) enterEdit();
+  savePos(); updateProgress();
+}
+function hlRegex(term) {   /* مطابقة مطبّعة: تتجاهل التشكيل وتوحّد الهمزات والياء والتاء المربوطة */
+  const q = GEN.norm(term).split(' ')[0]; if (!q) return null;
+  const pat = q.split('').map(ch => ({ 'ا': '[اأإآٱ]', 'ي': '[يى]', 'ه': '[هة]' }[ch] || ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))).join('[\\u064B-\\u065F\\u0640]*');
+  try { return new RegExp(pat, 'g'); } catch (e) { return null; }
+}
+function paraHtml(t, term) { const base = esc(t), re = term && hlRegex(term); return re ? base.replace(re, m => '<mark>' + m + '</mark>') : base; }
+function markIn(el, term) {   /* تظليل داخل عنصر غني دون المساس ببنيته */
+  const re = hlRegex(term); if (!re) return;
+  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = []; while (w.nextNode()) nodes.push(w.currentNode);
+  nodes.forEach(n => { re.lastIndex = 0; if (!re.test(n.data)) return; re.lastIndex = 0; const sp = document.createElement('span'); sp.innerHTML = esc(n.data).replace(re, m => '<mark class="sm">' + m + '</mark>'); n.replaceWith(...Array.from(sp.childNodes)); });
+}
+document.addEventListener('click', e => {
+  if (e.target.id === 'prevCh') renderChapter(S.ch - 1);
+  if (e.target.id === 'nextCh') renderChapter(S.ch + 1);
+});
+/* ═════ وضع التعديل: تعديل النص المعروض على جهازك دون المساس بالأصل (يُحفظ في بياناتك ويدخل النسخة الاحتياطية) ═════ */
+function origInner(el) { return blockInner(S.chs[+el.dataset.ci].subs[+el.dataset.si].paragraphs[+el.dataset.pi]); }
+function enterEdit() {
+  S.edit = true; document.body.classList.add('editing'); $('edBar').classList.add('on'); stopSpeech();
+  $('chapter').querySelectorAll('[data-k]').forEach(el => { el.contentEditable = 'true'; el._orig = el.innerHTML; });
+}
+function commitEdits() {
+  const ed = Object.assign({}, EDITS()); let n = 0;
+  $('chapter').querySelectorAll('[data-k]').forEach(el => {
+    if (el._orig == null) return;
+    const now = sanitize(el.innerHTML); if (now === sanitize(el._orig)) return;
+    const k = el.dataset.e;
+    if (!htmlText(now) || now === sanitize(origInner(el))) delete ed[k]; else ed[k] = now;   // كتلة فارغة أو مطابقة للأصل = استعادة الأصل
+    n++;
+  });
+  if (n) { DB.set('edits', ed); S.paras = null; vToast('حُفظ التعديل (' + n + ')'); }
+}
+function leaveEdit(save) {
+  if (!S.edit) return; if (save) commitEdits();
+  S.edit = false; document.body.classList.remove('editing'); $('edBar').classList.remove('on');
+}
+/* في وضع التعديل: اللصق نص عادي فقط، ومنع إسقاط محتوى خارجي */
+$('chapter').addEventListener('paste', e => { if (!S.edit) return; e.preventDefault(); const t = (e.clipboardData || window.clipboardData).getData('text/plain'); if (t) document.execCommand('insertText', false, t); });
+$('chapter').addEventListener('drop', e => { if (S.edit) e.preventDefault(); });
+$('edDone').onclick = () => { const k = topParaKey(); leaveEdit(true); renderChapter(S.ch, k); };
+$('edReset').onclick = () => {
+  if (!confirm('استعادة النص الأصلي لكل كتل هذا الفصل؟ سيُحذف تعديلك عليها.')) return;
+  const ed = Object.assign({}, EDITS()), k = topParaKey(), was = S.edit; leaveEdit(false);
+  $('chapter').querySelectorAll('[data-k]').forEach(el => { delete ed[el.dataset.e]; });
+  DB.set('edits', ed); S.paras = null; renderChapter(S.ch, k); if (was) enterEdit(); vToast('أُعيد النص الأصلي');
+};
+/* ═════ موضع القراءة والتقدم ═════ */
+let posT;
+function topParaKey() {
+  const sc = $('scroller'), top = sc.getBoundingClientRect().top + 8, ps = $('chapter').querySelectorAll('[data-k]');
+  for (const p of ps) { if (p.getBoundingClientRect().bottom > top) return p.dataset.k; }
+  return null;
+}
+function globalIndex(ci, si, pi) { let n = 0; for (let c = 0; c < ci; c++) S.chs[c].subs.forEach(s => { n += s.paragraphs.length; }); for (let s = 0; s < si; s++) n += S.chs[ci].subs[s].paragraphs.length; return n + pi; }
+function savePos() {
+  if (!S.book) return; const key = topParaKey(); let gi = 0, total = allParas().length;
+  if (key) { const q = key.split('|'); gi = globalIndex(+q[1], +q[2], +q[3]); } else gi = globalIndex(S.ch, 0, 0);
+  DB.set('pos:' + S.book.id, { ch: S.ch, key: key, gi: gi, total: total, at: Date.now() });
+  updateProgress(gi, total);
+}
+function updateProgress(gi, total) {
+  if (gi == null) { const p = DB.get('pos:' + S.book.id); gi = p ? p.gi : 0; total = allParas().length; }
+  $('rdProg').style.width = (total ? Math.min(100, 100 * (gi + 1) / total) : 0) + '%';
+}
+$('scroller').addEventListener('scroll', () => { clearTimeout(posT); posT = setTimeout(savePos, 400); }, { passive: true });
+window.addEventListener('pagehide', () => { if (curView === 'vRead') savePos(); });
+
+/* ═════ الفهرس ═════ */
+function openToc() {
+  let h = '', lp = null, ls = null;
+  S.chs.forEach((c, i) => {
+    if (c.part !== lp) { lp = c.part; ls = null; if (c.part) h += '<div class="toc-part">' + esc(c.part) + '</div>'; }
+    if (c.sec !== ls) { ls = c.sec; if (c.sec) h += '<div class="toc-sec">' + esc(c.sec) + '</div>'; }
+    h += '<button class="toc-ch' + (i === S.ch ? ' cur' : '') + '" data-ch="' + i + '">' + esc(c.title) + '</button>';
+  });
+  $('tocList').innerHTML = h; openOv('ovToc');
+  const cur = $('tocList').querySelector('.cur'); if (cur) cur.scrollIntoView({ block: 'center' });
+}
+$('tocList').addEventListener('click', e => { const b = e.target.closest('[data-ch]'); if (!b) return; closeOv('ovToc'); renderChapter(+b.dataset.ch); });
+
+/* ═════ البحث ═════ */
+let sScope = 'book', sT;
+function openSearch() { openOv('ovSearch'); $('sInput').value = ''; $('sRes').innerHTML = '<div class="empty">اكتب كلمة أو عبارة للبحث</div>'; setTimeout(() => $('sInput').focus(), 60); }
+function doSearch() {
+  const q = GEN.norm($('sInput').value), box = $('sRes');
+  if (q.length < 2) { box.innerHTML = '<div class="empty">اكتب حرفين على الأقل</div>'; return; }
+  const out = [];
+  if (sScope === 'book') {
+    for (const p of allParas()) { const n = GEN.norm(p.text), at = n.indexOf(q); if (at >= 0) { out.push({ p: p, at: at, k: p.key, sub: p.title }); if (out.length >= 80) break; } }
+  } else {
+    const notes = DB.get('notes', {});
+    Object.keys(notes).filter(k => k.indexOf(S.book.id + '|') === 0).forEach(k => { const n = notes[k]; if (GEN.norm(n.text || '').indexOf(q) >= 0) { const q2 = k.split('|'); const ps = allParas().find(x => x.key === k); out.push({ p: { key: k, text: n.text, ci: +q2[1] }, at: 0, k: k, sub: ps ? ps.title : '' }); } });
+  }
+  if (!out.length) { box.innerHTML = '<div class="empty">لا توجد نتائج</div>'; return; }
+  box.innerHTML = '<div style="font-size:.8rem;color:var(--text2);margin:0 2px 8px">' + out.length + (out.length >= 80 ? '+' : '') + ' نتيجة</div>' + out.map((r, i) => {
+    const t = r.p.text, s = Math.max(0, r.at - 40), snip = (s ? '… ' : '') + t.slice(s, s + 150) + (t.length > s + 150 ? ' …' : '');
+    return '<button class="res" data-i="' + i + '"><small>' + esc(r.sub) + '</small>' + paraHtml(snip, $('sInput').value) + '</button>';
+  }).join('');
+  box._res = out;
+}
+$('sInput').addEventListener('input', () => { clearTimeout(sT); sT = setTimeout(doSearch, 200); });
+$('sScope').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; sScope = b.dataset.s; document.querySelectorAll('#sScope button').forEach(x => x.classList.toggle('on', x === b)); doSearch(); });
+$('sRes').addEventListener('click', e => {
+  const b = e.target.closest('.res'); if (!b) return; const r = $('sRes')._res[+b.dataset.i]; if (!r) return;
+  const q = r.k.split('|'); closeOv('ovSearch'); renderChapter(+q[1], r.k, $('sInput').value);
+});
+
+/* ═════ إجراءات الفقرة: علامات وملاحظات ونسخ واستماع ═════ */
+let curPara = null;
+$('chapter').addEventListener('click', e => {
+  if (S.edit) return; const p = e.target.closest('[data-k]'); if (!p) return;
+  if (window.getSelection && String(window.getSelection()).length > 0) return;   // لا نقاطع تحديد النص
+  curPara = p; const n = DB.get('notes', {})[p.dataset.k] || {};
+  $('paraPrev').textContent = p.textContent.slice(0, 120) + (p.textContent.length > 120 ? '…' : '');
+  $('noteBox').style.display = 'none'; $('noteTxt').value = n.text || '';
+  $('pBm').textContent = n.bm ? '🔖 إزالة العلامة' : '🔖 علامة';
+  openOv('ovPara');
+});
+function mutNote(k, fn) {
+  const n = DB.get('notes', {}), r = n[k] || {}; fn(r);
+  if (!r.bm && !r.text) delete n[k]; else { r.at = Date.now(); n[k] = r; }
+  DB.set('notes', n);
+  const p = $('chapter').querySelector('p[data-k="' + CSS.escape(k) + '"]');
+  if (p) { const x = n[k]; p.classList.toggle('has-bm', !!(x && x.bm)); p.classList.toggle('has-note', !!(x && x.text)); }
+}
+$('pBm').onclick = () => { const k = curPara.dataset.k; mutNote(k, r => { r.bm = !r.bm; }); closeOv('ovPara'); vToast('تم'); };
+$('pNote').onclick = () => { $('noteBox').style.display = 'block'; $('noteTxt').focus(); };
+$('noteSave').onclick = () => { const v = $('noteTxt').value.trim(), k = curPara.dataset.k; mutNote(k, r => { r.text = v; }); closeOv('ovPara'); vToast(v ? 'حُفظت الملاحظة' : 'حُذفت الملاحظة'); };
+$('noteDel').onclick = () => { mutNote(curPara.dataset.k, r => { r.text = ''; }); closeOv('ovPara'); };
+$('pCopy').onclick = async () => { try { await navigator.clipboard.writeText(curPara.textContent); vToast('تم النسخ'); } catch (e) { vToast('تعذّر النسخ'); } closeOv('ovPara'); };
+$('pListen').onclick = () => { const p = curPara; closeOv('ovPara'); listenFrom(p); };
+
+/* ═════ شاشة العلامات والملاحظات ═════ */
+function openNotes() {
+  const notes = DB.get('notes', {}), ks = Object.keys(notes).sort((a, b) => (notes[b].at || 0) - (notes[a].at || 0));
+  const box = $('ntBody');
+  box.innerHTML = ks.length ? '' : '<div class="empty">لا علامات ولا ملاحظات بعد.<br>اضغط أي فقرة أثناء القراءة لإضافتها.</div>';
+  ks.forEach(k => {
+    const id = k.split('|')[0], meta = S.lib.find(b => b.id === id); if (!meta) return;
+    const n = notes[k], d = document.createElement('button'); d.className = 'res'; d.dataset.k = k;
+    d.innerHTML = '<small>' + esc(meta.title) + (n.bm ? ' · 🔖' : '') + '</small>' + (n.text ? '<b>' + esc(n.text) + '</b>' : '<span style="color:var(--text2)">فقرة معلّمة</span>');
+    box.appendChild(d);
+  });
+  showView('vNotes');
+}
+$('ntBody').addEventListener('click', async e => {
+  const b = e.target.closest('.res'); if (!b) return; const k = b.dataset.k, q = k.split('|');
+  if (!(await ensureBook(q[0]))) return; DB.set('lastBook', q[0]); showView('vRead'); $('rdTitle').textContent = S.book.title; renderChapter(+q[1], k, '');
+});
+
+/* ═════ الصوت العربي (Web Speech) ═════ */
+const TTS = { sid: 0, on: false, el: null };
+let voices = [];
+function loadVoices() {
+  if (!window.speechSynthesis) return;
+  voices = speechSynthesis.getVoices().filter(v => /^ar/i.test(v.lang));
+  const sel = $('voiceSel'); sel.innerHTML = voices.length ? '<option value="">الأفضل تلقائيًا</option>' + voices.map(v => '<option value="' + esc(v.voiceURI) + '">' + esc(v.name) + ' (' + esc(v.lang) + ')</option>').join('') : '<option value="">لا يوجد صوت عربي في هذا الجهاز</option>';
+  sel.value = S.settings ? S.settings.voice : '';
+}
+if (window.speechSynthesis) { speechSynthesis.onvoiceschanged = loadVoices; }
+function pickVoice() { return voices.find(v => v.voiceURI === S.settings.voice) || voices.find(v => /ar-(SA|EG)/i.test(v.lang)) || voices[0] || null; }
+function chunkText(t) {   // تقطيع الجمل الطويلة (متصفحات كروم تتوقف عند نص طويل)
+  const parts = t.split(/(?<=[.!؟?؛:،])\s+/), out = []; let cur = '';
+  parts.forEach(s => { if ((cur + ' ' + s).length > 180 && cur) { out.push(cur); cur = s; } else cur = cur ? cur + ' ' + s : s; });
+  if (cur) out.push(cur); return out;
+}
+function setSpeaking(p) { if (TTS.el) TTS.el.classList.remove('speaking'); TTS.el = p; if (p) { p.classList.add('speaking'); p.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }
+function stopSpeech() { TTS.sid++; TTS.on = false; setSpeaking(null); $('stopFab').classList.remove('on'); if (window.speechSynthesis) speechSynthesis.cancel(); }
+function listenFrom(p) {
+  if (!window.speechSynthesis) { vToast('المتصفح لا يدعم القراءة الصوتية'); return; }
+  if (!voices.length) { loadVoices(); }
+  if (!voices.length) vToast('لا يوجد صوت عربي مثبّت — سيُستخدم صوت الجهاز الافتراضي');
+  stopSpeech(); const sid = ++TTS.sid; TTS.on = true; $('stopFab').classList.add('on');
+  const ps = Array.from($('chapter').querySelectorAll('[data-k]')); let i = Math.max(0, ps.indexOf(p));
+  setTimeout(() => {   // تأخير بسيط بعد cancel لتفادي سباق الإلغاء/النطق
+    const next = () => {
+      if (sid !== TTS.sid) return;
+      if (i >= ps.length) { if (S.ch < S.chs.length - 1) { renderChapter(S.ch + 1); listenFrom($('chapter').querySelector('[data-k]')); } else stopSpeech(); return; }
+      const cur = ps[i++]; setSpeaking(cur); const chunks = chunkText(cur.textContent); let j = 0;
+      const one = () => {
+        if (sid !== TTS.sid) return; if (j >= chunks.length) return next();
+        const u = new SpeechSynthesisUtterance(chunks[j++]); u.lang = 'ar'; u.rate = +S.settings.rate || 1; const v = pickVoice(); if (v) { u.voice = v; u.lang = v.lang; }
+        u.onend = one; u.onerror = ev => { if (ev.error === 'interrupted' || ev.error === 'canceled') return; one(); };
+        speechSynthesis.speak(u);
+      };
+      one();
+    };
+    next();
+  }, 80);
+}
+$('rdListen').onclick = () => { if (TTS.on) { stopSpeech(); return; } const p = $('chapter').querySelector('[data-k]'); const top = topParaKey(); listenFrom(top ? $('chapter').querySelector('p[data-k="' + CSS.escape(top) + '"]') : p); };
+$('stopFab').onclick = stopSpeech;
+
+/* ═════ التدريب والمراجعة ═════ */
+const PR = { q: [], i: 0, ok: 0, done: false, mode: 'mixed' };
+function today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+function dailyState() { const d = DB.get('daily', { day: today(), n: 0, ok: 0, streak: 0, last: '' }); if (d.day !== today()) { d.day = today(); d.n = 0; d.ok = 0; } return d; }
+function openPractice() { PR.q = []; showView('vPrac'); renderPracHome(); }
+function renderPracHome() {
+  const id = S.book.id, ans = DB.get('ans', {}), srs = DB.get('srs', {}), now = Date.now(), d = dailyState();
+  const mine = S.bank.filter(q => ans[q.id]), okn = mine.filter(q => ans[q.id].correct).length;
+  const due = S.bank.filter(q => srs[q.id] && srs[q.id].next <= now).length, wrong = S.bank.filter(q => ans[q.id] && !ans[q.id].correct).length;
+  $('prBody').innerHTML = '<div class="card"><h3>' + esc(S.book.title) + '</h3><div class="meta">بنك الأسئلة: ' + S.bank.length + ' سؤال' + (S.bank.length ? '' : ' — سيُولَّد تدريب فراغات من نص الكتاب') + '</div></div>' +
+    '<div class="stats"><div class="stat"><b>' + (mine.length ? Math.round(100 * okn / mine.length) + '٪' : '—') + '</b><span>الدقة</span></div><div class="stat"><b>' + d.n + '/' + APP_CONFIG.dailyGoal + '</b><span>هدف اليوم</span></div><div class="stat"><b>' + (d.streak || 0) + '</b><span>أيام متتالية</span></div></div>' +
+    '<div class="seg" style="margin-bottom:12px"><button class="on" id="n10">10 أسئلة</button><button id="n20">20</button><button id="n5">5</button></div>' +
+    '<button class="btn" style="width:100%;margin-bottom:8px" data-m="mixed">ابدأ جلسة</button>' +
+    '<button class="btn sec" style="width:100%;margin-bottom:8px" data-m="due"' + (due ? '' : ' disabled') + '>مراجعة المستحق اليوم (' + due + ')</button>' +
+    '<button class="btn sec" style="width:100%" data-m="wrong"' + (wrong ? '' : ' disabled') + '>أسئلتي الخاطئة (' + wrong + ')</button>';
+  PR.n = 10;
+}
+function startPractice(mode) {
+  const q = GEN.session({ bank: S.bank, paras: allParas(), srs: DB.get('srs', {}), answers: DB.get('ans', {}), n: PR.n || 10, mode: mode });
+  if (!q.length) { vToast('لا توجد أسئلة متاحة لهذا الوضع'); return; }
+  PR.q = q; PR.i = 0; PR.ok = 0; renderQuestion();
+}
+function renderQuestion() {
+  const q = PR.q[PR.i], box = $('prBody'), tf = q.type === 'tf', LT = ['أ', 'ب', 'ج', 'د', 'هـ'];
+  box.innerHTML = '<div class="qhead"><span>سؤال ' + (PR.i + 1) + ' من ' + PR.q.length + '</span><span>' + esc(q.principle) + '</span></div><div class="q">' + esc(q.text) + '</div><div class="' + (tf ? 'opts-tf' : '') + '">' + q.options.map((o, i) => '<button class="opt" data-o="' + i + '">' + (tf ? '' : '<span class="olt">' + (LT[i] || '') + '</span>') + esc(o) + '</button>').join('') + '</div><div id="fb"></div>';
+  PR.done = false;
+}
+function answer(i) {
+  if (PR.done) return; PR.done = true; const q = PR.q[PR.i], ok = i === q.correct;
+  document.querySelectorAll('.opt').forEach((b, k) => { b.classList.toggle('ok', k === q.correct); if (k === i && !ok) b.classList.add('bad'); b.disabled = true; });
+  if (ok) PR.ok++;
+  const ap = q.anchor ? findAnchor(q.anchor) : null;
+  const ans = DB.get('ans', {}), srs = DB.get('srs', {});
+  ans[q.id] = { chosen: i, correct: ok, at: Date.now() }; srs[q.id] = GEN.srsUpdate(srs[q.id], ok);
+  DB.set('ans', ans); DB.set('srs', srs);
+  const d = dailyState(); d.n++; if (ok) d.ok++;
+  if (d.n >= APP_CONFIG.dailyGoal && d.last !== d.day) { const y = new Date(Date.now() - 864e5), ys = y.getFullYear() + '-' + (y.getMonth() + 1) + '-' + y.getDate(); d.streak = d.lastDay === ys ? (d.streak || 0) + 1 : 1; d.last = d.day; d.lastDay = d.day; }
+  DB.set('daily', d);
+  $('fb').innerHTML = '<div class="expl"><b>' + (ok ? '✔ إجابة صحيحة' : '✘ إجابة خاطئة') + '</b>' + (q.explanation ? '<br>' + esc(q.explanation) : '') + '</div>' + (ap ? '<button class="btn ghost" style="width:100%;margin-bottom:8px" data-rd="' + esc(ap.key) + '">📖 اقرأ الفقرة في الكتاب</button>' : '') + '<button class="btn" style="width:100%" id="nextQ">' + (PR.i + 1 < PR.q.length ? 'التالي' : 'إنهاء') + '</button>';
+}
+function findAnchor(a) {   /* ربط السؤال بالفقرة بمرساة نصية: ينجح فقط إذا وردت العبارة المطبّعة في فقرة واحدة بالضبط */
+  const n = GEN.norm(a); if (n.length < 8) return null;
+  const hits = allParas().filter(p => (p.n || (p.n = GEN.norm(p.text))).indexOf(n) >= 0);
+  return hits.length === 1 ? hits[0] : null;
+}
+function finishPractice() {
+  $('prBody').innerHTML = '<div class="card" style="text-align:center"><h3>انتهت الجلسة</h3><div style="font-size:2rem;font-weight:800;color:var(--accent-ink);margin:8px 0">' + PR.ok + ' / ' + PR.q.length + '</div><div class="meta">' + (PR.ok === PR.q.length ? 'ممتاز!' : 'راجع الأسئلة الخاطئة من الشاشة الرئيسية للتدريب') + '</div></div><button class="btn" style="width:100%" id="again">العودة للتدريب</button>';
+}
+$('prBody').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.m) startPractice(b.dataset.m);
+  else if (b.dataset.rd) { const q = b.dataset.rd.split('|'); PR.resume = true; $('rdTitle').textContent = S.book.title; showView('vRead'); renderChapter(+q[1], b.dataset.rd, null, true); }
+  else if (b.dataset.o != null) answer(+b.dataset.o);
+  else if (b.id === 'nextQ') { PR.i++; PR.i < PR.q.length ? renderQuestion() : finishPractice(); }
+  else if (b.id === 'again') renderPracHome();
+  else if (/^n\d+$/.test(b.id)) { PR.n = +b.id.slice(1); document.querySelectorAll('#prBody .seg button').forEach(x => x.classList.toggle('on', x === b)); }
+});
+
+/* ═════ استيراد txt ═════ */
+let impBook = null;
+async function readTextFile(file) {
+  const buf = await file.arrayBuffer(); let t = new TextDecoder('utf-8').decode(buf);
+  if (t.indexOf('�') >= 0 && (t.match(/�/g) || []).length > 3) { try { t = new TextDecoder('windows-1256').decode(buf); } catch (e) {} }
+  return t.replace(/^﻿/, '');
+}
+/* تحليل نص خام إلى بنية: باب → قسم → فصل → مبحث → فقرات */
+function parseTxt(text, title) {
+  const L = { part: /^\s*(الباب|باب)\s+\S+/, sec: /^\s*(القسم|قسم)\s+\S+/, ch: /^\s*(الفصل|فصل)\s+\S+/, sub: /^\s*(المبحث|مبحث|المطلب|مطلب|الفرع|فرع)\s+\S+/ };
+  const parts = []; let P = null, Sx = null, C = null, U = null;
+  const ensure = () => {
+    if (!P) { P = { title: '', sections: [] }; parts.push(P); }
+    if (!Sx) { Sx = { title: '', chapters: [] }; P.sections.push(Sx); }
+    if (!C) { C = { title: 'النص', subsections: [] }; Sx.chapters.push(C); }
+    if (!U) { U = { title: '', paragraphs: [] }; C.subsections.push(U); }
+  };
+  text.replace(/\r/g, '').split('\n').forEach(raw => {
+    const ln = raw.trim(); if (!ln) return;
+    const short = ln.length <= 140;
+    if (short && L.part.test(ln)) { P = { title: ln, sections: [] }; parts.push(P); Sx = C = U = null; }
+    else if (short && L.sec.test(ln)) { if (!P) { P = { title: '', sections: [] }; parts.push(P); } Sx = { title: ln, chapters: [] }; P.sections.push(Sx); C = U = null; }
+    else if (short && L.ch.test(ln)) { if (!P) { P = { title: '', sections: [] }; parts.push(P); } if (!Sx) { Sx = { title: '', chapters: [] }; P.sections.push(Sx); } C = { title: ln, subsections: [] }; Sx.chapters.push(C); U = null; }
+    else if (short && L.sub.test(ln)) { ensure(); U = { title: ln, paragraphs: [] }; C.subsections.push(U); }
+    else { ensure(); U.paragraphs.push(ln); }
+  });
+  parts.forEach(p => p.sections.forEach(s => s.chapters.forEach(c => { c.subsections = c.subsections.filter(u => u.paragraphs.length || u.title); })));
+  return { id: 'imp-' + Date.now().toString(36), title: title || 'كتاب مستورد', subtitle: '', lang: 'ar', structure: { parts: parts } };
+}
+function previewImport(book) {
+  const chs = flatten(book), np = chs.reduce((n, c) => n + c.subs.reduce((m, s) => m + s.paragraphs.length, 0), 0);
+  $('impStats').textContent = book.structure.parts.length + ' باب · ' + chs.length + ' فصل · ' + np + ' فقرة';
+  $('impTree').innerHTML = chs.slice(0, 60).map(c => '<div>' + esc(c.title) + ' <span style="color:var(--text2)">(' + c.subs.reduce((m, s) => m + s.paragraphs.length, 0) + ' فقرة)</span></div>').join('') + (chs.length > 60 ? '<div>…</div>' : '');
+  $('impOk').disabled = !np;
+}
+$('btnImport').onclick = () => $('fileTxt').click();
+$('fileTxt').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { const t = await readTextFile(f); impBook = parseTxt(t, f.name.replace(/\.[^.]+$/, '')); $('impTitle').value = impBook.title; previewImport(impBook); openOv('ovImport'); } catch (er) { vToast('تعذّرت قراءة الملف'); }
+};
+$('impOk').onclick = async () => {
+  if (!impBook) return; impBook.title = $('impTitle').value.trim() || impBook.title;
+  DB.set('book:' + impBook.id, impBook); impBook = null; closeOv('ovImport');
+  await loadLibrary(); renderLibrary(); vToast('أُضيف الكتاب إلى مكتبتك');
+};
+
+/* ═════ الإعدادات والنسخ الاحتياطي ═════ */
+function openSettings() { loadVoices(); applySettings(); openOv('ovSet'); }
+$('fPlus').onclick = () => { S.settings.fs = Math.min(200, S.settings.fs + 10); saveSettings(); applySettings(); };
+$('fMinus').onclick = () => { S.settings.fs = Math.max(70, S.settings.fs - 10); saveSettings(); applySettings(); };
+$('themeSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.settings.theme = b.dataset.t; saveSettings(); applySettings(); };
+$('rateSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.settings.rate = +b.dataset.r; saveSettings(); applySettings(); };
+$('fontSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.settings.font = b.dataset.f; saveSettings(); applySettings(); };
+$('edToggle').onclick = () => { closeOv('ovSet'); if (curView !== 'vRead') { vToast('افتح كتابًا أولًا ثم فعّل وضع التعديل'); return; } if (S.edit) { const k = topParaKey(); leaveEdit(true); renderChapter(S.ch, k); } else enterEdit(); };
+$('voiceSel').onchange = e => { S.settings.voice = e.target.value; saveSettings(); };
+function backupObject() { const all = DB.all(), out = { app: 'law-review', v: 1, at: Date.now(), data: {} }; Object.keys(all).forEach(k => { out.data[k] = all[k]; }); return out; }
+function downloadBlob(name, text) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+$('bkOut').onclick = () => { downloadBlob('law-review-backup-' + today() + '.json', JSON.stringify(backupObject())); DB.set('backupAt', Date.now()); vToast('تم حفظ النسخة'); };
+$('bkIn').onclick = () => $('fileBk').click();
+$('fileBk').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const o = JSON.parse(await f.text()); if (o.app !== 'law-review' || !o.data) throw 0;
+    if (!confirm('ستُستبدل بياناتك الحالية بمحتوى النسخة. متابعة؟')) return;
+    DB.keys().forEach(k => DB.del(k)); Object.keys(o.data).forEach(k => DB.set(k, o.data[k]));
+    await loadLibrary(); loadSettings(); renderLibrary(); closeOv('ovSet'); vToast('تمت الاستعادة');
+  } catch (er) { vToast('الملف ليس نسخة صالحة'); }
+};
+/* ربط مجلد (File System Access — كروم/إيدج فقط): نسخة احتياطية تلقائية داخل مجلد يختاره المستخدم */
+const FS_OK = !!window.showDirectoryPicker;
+$('fsNote').textContent = FS_OK ? 'اختر مجلدًا ليُحفظ فيه ملف النسخة الاحتياطية بضغطة واحدة.' : 'هذه الميزة غير متاحة في متصفحك — استخدم «حفظ نسخة (ملف)».';
+$('fsLink').disabled = !FS_OK;
+$('fsLink').onclick = async () => {
+  try {
+    const dir = await window.showDirectoryPicker({ mode: 'readwrite' });
+    const fh = await dir.getFileHandle('law-review-backup.json', { create: true }), w = await fh.createWritable();
+    await w.write(JSON.stringify(backupObject())); await w.close(); DB.set('backupAt', Date.now()); vToast('حُفظت النسخة داخل المجلد');
+  } catch (e) { if (e && e.name !== 'AbortError') vToast('تعذّر الحفظ في المجلد'); }
+};
+
+/* ═════ ربط الأزرار العامة ═════ */
+$('libSettings').onclick = openSettings; $('rdSet').onclick = openSettings;
+$('btnNotes').onclick = openNotes;
+$('rdBack').onclick = () => { leaveEdit(true); stopSpeech(); savePos(); renderLibrary(); showView('vLib'); };
+$('rdToc').onclick = openToc; $('rdSearch').onclick = openSearch; $('rdPrac').onclick = () => { leaveEdit(true); stopSpeech(); savePos(); if (PR.resume && PR.q.length) { PR.resume = false; showView('vPrac'); } else openPractice(); };
+$('prBack').onclick = () => { if (S.book) { showView('vRead'); } else showView('vLib'); };
+$('ntBack').onclick = () => { renderLibrary(); showView('vLib'); };
+
+/* ═════ الإقلاع ═════ */
+(async function boot() {
+  document.documentElement.style.setProperty('--accent', APP_CONFIG.accent);
+  await DB.init();
+  if (DB.mode() !== 'idb') { const b = $('storeBanner'); b.textContent = 'تنبيه: تعذّر استخدام تخزين المتصفح، فلن يُحفظ تقدمك بعد إغلاق الصفحة. استخدم «حفظ نسخة» من الإعدادات.'; b.classList.add('on'); }
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+  loadSettings(); await loadLibrary(); renderLibrary(); loadVoices();
+  history.replaceState({ v: 'vLib' }, '');
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) navigator.serviceWorker.register('sw.js').catch(() => {});
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>
