@@ -1,0 +1,18 @@
+{
+ "books": [
+  {
+   "id": "madar-penal-territoriality",
+   "title": "تطبيق قانون العقوبات من حيث المكان",
+   "subtitle": "شرح وأسئلة (دفعة أولى)",
+   "file": "books/madar-penal-territoriality.json",
+   "questions": "questions/madar-penal-territoriality.json"
+  },
+  {
+   "id": "intro-law-sample",
+   "title": "مدخل لدراسة القانون",
+   "subtitle": "نسخة تجريبية للقالب",
+   "file": "books/intro-law-sample.json",
+   "questions": "questions/intro-law-sample.json"
+  }
+ ]
+}
